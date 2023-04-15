@@ -1,0 +1,570 @@
+---
+title: 'Programación para el análisis de datos: Práctica 2'
+author: "Daniel Fraiman"
+date: marzo 2023
+output:
+  pdf_document: default
+  html_document: default
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# **Funciones**
+
+Las funciones tienen un input y como salida dan algún output. La función
+sample tiene dos inputs el vector de donde quiero elegir los números
+(x), y cuantos quiero sacar (n). La salida es el vector de los n números
+aleatorios
+
+```{r,eval=FALSE}
+ salida = sample(x, n)
+```
+
+La función sample viene predeterminada en R, como tambien viene la
+funcion mean(x) (promedio de los numeros que estan en x), y hay
+muchísimas más.
+
+Para usar las funciones siempre ponemos paréntesis, y dentro del
+paréntesis van los inputs (o argumentos) respetando cierto orden
+establecido.
+
+## Funciones predeterminadas
+
+### 1. Resolver utilizando la funcion sum:
+
+#### a) $1 + 2 + 3 + 4 + 5 + ... + 100$
+
+```{r}
+sum(1:100)
+```
+
+#### b) $1 + 1/2 + 1/3 + 1/4 + 1/5 + ... + 1/100$
+
+```{r}
+vector2=c(1:100)
+sum(1/vector2)
+```
+
+#### c) $1/2 + 1/4 + 1/8 + 1/16 + 1/32 + 1/64 + 1/128$
+
+```{r}
+
+vector3<-c(1:7)
+sum(1/(2^vector3))
+1/2+1/4+1/8+1/16+1/32+1/64+1/128
+```
+
+#### d) $1/2 + 1/2^2 + 1/2^3 + 1/2^4 + 1/2^5 + ... + 1/2^50$
+
+```{r}
+vector4<-c(1:4)
+sum(1/(2^vector4))
+1/2+1/4+1/8+1/16
+```
+
+### 2. El comando str(funcion_a\_estudiar) nos dice los argumentos de la función. Escribir str(mean). ¿Qué le parece que son los ...? Si no entendió los ... no se preocupe, en el ejercicio 10 lo va a entender. Escriba str(sum).
+
+```{r}
+str(sapply)
+```
+
+### 3. La función apply\$ es útil para escribir menos código (nos ahorra a veces loops). Escribir $str(apply)$
+
+#### a) Defina una matriz $x$ de 20 filas y 4 columnas con los números que quiera (pero que no sean todos iguales).
+
+##### i. Escriba $apply(x,1,mean)$ y luego $apply(x,2,mean)$. ¿Qué hace esta función? ¿Qué puede decir del argumento MARGINAL?
+
+##### ii. Aplique la función $sum$ ahora en apply. También puede crear su propia función y ponerla ahí.
+
+```{r}
+x<- matrix(nrow=20, ncol=4)
+x[,]<- round(runif(80,0,100),0)
+#x
+#apply(x,2,mean)
+#apply(x,1,mean)
+x[,1]
+#el argumento marginal sirve para indicar si la operacion que estamos haciendo debe hacerse sobre filas o columnas
+
+
+
+```
+
+### 4. Investigue cómo se aplica la función $apply$ sobre un array de 2x3x4. ¿Qué hace apply(x, 3, mean)?
+
+```{r}
+array_4<-x<-array(dim=c(2,3,4))
+array_4[,,]<-c(1:12)
+array_4
+apply(array_4,3,mean)
+#apply(x, 3, mean) calcula la media de todos los valores de cada matriz
+
+apply(array_4,2,mean)
+
+```
+
+### 5. El comando $lapply$ hace lo mismo que $apply$ sobre listas. En este caso no hay marginales. Ejemplo:
+
+```{r}
+
+```
+
+### 6. ¿Qué pasa si la lista tiene un vector de caracteres? Ej:
+
+```{r,eval=FALSE}
+lista<-list(a=c(1,2),b=c("A","B"),s=c(1:10))
+lista
+lapply(lista[3],sum)
+```
+
+### 7. Defina el data frame:
+
+```{r,eval=FALSE}
+datos<- data.frame(X=sample(c(1:10),10),prov=c(rep("CABA",4),rep("PBA",6))) 
+datos
+```
+
+y escriba el comando
+
+```{r,eval=FALSE}
+tapply(datos$X,datos$prov,mean)
+```
+
+¿Qué obtiene?
+
+```{r}
+# la media de X para cada provincia
+```
+
+### 8. Escriba unique(datos\$prov). ¿Qué hace $unique$? Es un comando muy útil.
+
+```{r}
+unique(datos$prov)
+```
+
+### 9. ¿Cuál es la diferencia entre $sort$ y $order$? Aplique estas dos funciones sobre
+
+```{r,eval=FALSE}
+x<-sample(c(1:8),8)
+x
+sort(x)
+order(x)
+#order devulve los indices del vector 1 segun como deberian acomodarse para quedar ordenados de menor a mayor
+```
+
+### 10. Volviendo a los \`\`...'' de argumento de una función. Escriba lo siguiente:
+
+```{r,eval=FALSE}
+variablex<-c(1:10)
+variabley<- seq(1,20,length=10) 
+plot(variablex,variabley)
+str(plot)
+plot(variablex,variabley,xlab="x",ylab="y",main="Gráfico básico",pch=4)
+```
+
+¿Ahora entendió? Los "..." del argumento de la función plot. En el
+ejemplo usamos
+
+```{r,eval=FALSE}
+xlab="x",ylab="x",main="Gráfico básico",pch=4
+```
+
+## Funciones definidas por nosotros
+
+Primero debemos tener claro cual es input y cual queremos que sea el
+output. Supongamos que queremos hacer una funcion que le doy datos
+(input) y queremos que nos devuelva (output) la media, la mediana, y el
+desvio estandar. A esta funcion la llamaremos $medidasresumen$ y al
+input lo llamaremos $x$, la sintaxis es la siguiente:
+
+```{r,eval = FALSE}
+ medidasresumen=function(x)  # definimos  medidasresumen como una funci\'on
+{ promedio=mean(x)   # utilizamos una funcion predeterminada
+  mediana=median(x)    # autilizamos una funcion predeterminada
+  desvio=sd(x)   # utilizamos  una funcion predeterminada
+  return(c(promedio,mediana, desvio)) # definimos el output 
+ }  # el output es un vector con 3 coordenadas
+medidasresumen(c(1,2,3,4))
+```
+
+### 11. Defina una función, $sumando(N)$, que tenga al numero $N$ como el unico argumento (input), y que devuelva la siguiente suma:
+
+#### a) $1 + 2 + 3 + 4 + 5 +...+N$. Y que escriba el resultado en pantalla. Hint: comando print
+
+```{r}
+sumando=function(x){
+  print(sum(c(1:x)))
+}
+sumando(5)
+```
+
+#### b) 1 + 2 + 3 + 4 + 5 + ... + N. Y que devuelva el resultado para poder ser utilizarlo luego. Hint: comando return
+
+```{r}
+sumando_2=function(x){
+  return(sum(c(1:x)))
+}
+sumando_2(5)
+```
+
+#### c) $1/2 + 1/2^2 + 1/2^3 + 1/2^4 + 1/2^5 + ... + 1/2^N$ . Y que devuelva el resultado para poder ser utilizado luego. ¿Cuanto vale la suma para $N$ 2, 3, 10, y 100? ¿Hay algo que le llama la atencion?
+
+```{r}
+sumando_3=function(x){
+  denominador=c(1:x)
+  return(sum(1/2^denominador))
+}
+sumando_3(100)
+```
+
+#### d) Haga un grafico de la suma definida en $c$ en funcion de $N$. Tome distintos valores de $N$.
+
+```{r}
+
+x<-c(1,2,3,10,20,30,40,50,60,70,80,90,100)
+y=sapply(x,sumando_3)
+plot(x, y)
+```
+
+### 12. Defina la lista
+
+```{r,eval=FALSE}
+x <- list(a = matrix(1:4, 2, 2), b = matrix(1:6, 3, 2))
+x[[1]][,1]
+x
+```
+
+y una función $f$ que tome la primera columna de una matriz. Ahora,
+aplique la función $lapply$ sobre $x$ con la función $f$.
+
+```{r}
+matriz_12<-matrix(c(1:9),nrow=3,ncol=3)
+f=function(matriz){
+  return(matriz[,1])
+}
+lapply(f(x[[1]]),sum)
+#PREGUNTAR!!!!!
+
+```
+
+# **Loops**
+
+### 13. Lea los siguientes códigos e interprete la salida. Luego córralos.
+
+#### a)
+
+```{r,eval = FALSE}
+ for (i in 1:10){print(i)}  # notar que para el for usamos { }
+```
+
+#### b)
+
+```{r,eval = FALSE}
+ w=c(2,4,9)
+ for (i in w){ print(i)}
+
+```
+
+#### c)
+
+```{r,eval = FALSE}
+ w=seq(0,2,0.2)
+ for (i in w){ print(i)}
+```
+
+#### d)
+
+```{r,eval = FALSE}
+ palabras=c("subte","casa","auto","tren")
+ for(ojo in palabras) {print(ojo) } # 
+```
+
+#### e)
+
+```{r,eval = FALSE}
+ for (i in 1:5) {
+ 	for (k in 12:14){ # un ciclo dentro de otro (en la medida de lo posible evitarlo)
+ 		   	print(c(i,k))
+ 			}
+		}
+```
+
+#### f)
+
+```{r,eval = FALSE}
+ par(mfrow=c(3,2)) # parte la pantalla gráfica en 6 subgráficos 3 filas 2 columnas 
+ for (i in 1:6)
+ 	 { muestra<-rnorm(50,0,1)
+      texto <-paste("muestra", i, sep=" ") 
+	    hist(muestra,col="red",main=texto) # muestra el texto arriba del gr'afico
+	  }
+```
+
+### 14. Resolver utilizando el comando $for$:
+
+#### a) Sume los números del 1 al 200 a partir de un vector $x=c(1:200)$. Hint: ¿Dónde va a guardar la sumas parciales?
+
+```{r}
+x_14<-c(1:5)
+resultado<-0
+for (i in x_14){
+  resultado=resultado+x_14[i]
+}
+print(resultado)
+```
+
+#### b) Sume los números del 1 al 200 a partir de una única variable $b$ (sin definir el vector x anterior). Hint: no se olvide de inicializar la variable
+
+```{r}
+b=5
+resultado=0
+for (i in 1:b){
+  resultado=resultado+i
+  print(resultado)
+}
+```
+
+#### c) Tome una muestra de tama\~no 100 de una variable aleatorio Uniforme entre el 0 y 10. Calcule el promedio de esta muestra, y guarde este resultado en alguna coordenada del vector $w$. Repita esto 500 veces, rellenando el vector $w$ con los promedios en cada muestra. Finalmente estudie la distribuci'on de los promedios ($w$).
+
+Tendrá que usar los siguientes comandos en algún orden:
+
+```{r,eval=FALSE}
+w<-vector()
+ for(i in 1:500) {
+   muestra<-runif(100,0,10) 
+   w[i]<-mean(muestra)
+ }
+ hist(w,main='Distribucion de los promedios')
+
+```
+
+#### d) Notar que en el ejercicio anterior tomamos muestras de variables uniformes y la distribución de los promedios tiene pinta de ser $star$. Este es uno de los resultados más importantes de la Estadística y el resultado se conoce como $Teorema Central del Límite$.
+
+```{r}
+```
+
+#### e) Repita el item (c) pero ahora cambie la uniforme por otra variable aleatoria por ejemplo la Exponencial. El comando ser'ia $rexp(100,star)$. Antes de resolver este ejercicio haga un histograma de una muestra aleatoria Exponencial. ¿Cu'al es el rol de $star$?
+
+```{r}
+w<-vector()
+ for(i in 1:500) {
+   muestra<-rexp(100) 
+   w[i]<-mean(muestra)
+ }
+ hist(w,main='Distribucion de los promedios')
+```
+
+#### f) Momento de emocionarse... $Teorema Central del Límite$:
+
+Sin importar cuál es la distribución (la forma del histograma) de la
+variable que estamos estudiando, teniendo 'esta un promedio poblacional
+$\mu$ y un desv'io poblacional $\sigma$, la distribuci'on (muestral) de
+la variable aleatoria $promedio$ se aproxima a una Normal centrada en
+$\mu$ con desvío $\frac{\sigma}{\sqrt{n}}$ a medida que $n$ crece.}}
+¿Ahora entendió los items (d) y (e)? ¿No es sorprendente? La Normal
+aparece m'agicamente (ahora les paso un pa\~nuelo para secarse las
+lágrimas)...¿Por qué será cierto este teorema?
+
+### 15. Utilizando tic() toc() del paquete pracma tomarle el tiempo de ejecución a los siguientes códigos:
+
+```{r,eval=FALSE}
+library(tictoc) # o library(pracma)
+N=100000 
+x=seq(1,N,1)
+##### opcion 1
+tic()
+v <- vector()
+ for (i in 1:N) { v[i] = x[i]^2}
+toc()
+##### opcion 2
+tic()
+v = x^2
+toc()
+```
+
+### 16. ¿Observó alguna diferencia de tiempos en el ejercicio anterior? ¿Qué conclusión saca?
+
+# **Condiciones lógicas**
+
+### 17. Lea los siguiente código e interprete la salida. Luego córralo.
+
+```{r,eval=FALSE}
+ for (i in 1:10){ 
+ 		 if (i==3) { print(i)}  # i==3  pregunta si i es igual al n'umero 3
+       	          }
+```
+
+### 18. Escriba un programa utilizando únicamente los comandos \blue{for, nchar, if, print} que imprimi solamente las palabra del vector $palabras$ que tienen un número de caracteres distinto de 4.
+
+```{r}
+palabras=c("casa","subte","auto","tren")
+for (i in palabras){
+  if (nchar(i)!=4){print(i)}
+}
+```
+
+### 19. Escriba un "programa" utilizando u ́nicamente el comando nchar para resolver el pro- blema anterior. Hint: palabras es un vector.
+
+```{r}
+palabras=c("casa","subte","auto","tren")
+palabras[nchar(palabras)==5]
+```
+
+### 20. Escriba una función cuya entrada sea un número b y cuya salida sea alguna de las siguientes alternativas:
+
+```{r,eval=FALSE}
+funcion_20=function(b){
+  x<-b==2
+  y<-b>2
+  z<-b<2
+if (x==TRUE) {
+    print(c('paso por la condicion el número es igual a 2, el numero es ', b ))}
+if (y==TRUE) {
+    print(c('paso por la condicion el número es mayor a 2, el numero es ', b ))}
+if (z==TRUE) {
+    print(c('paso por la condicion el número es menor a 2, el numero es ', b ))}
+}
+funcion_20(3)
+```
+
+### 21. Escriba el programa anterior de la siguiente manera. Primero defina las condiciones lógicas y luego que el if "pregunte" si la condició́n es TRUE
+
+```{r}
+```
+
+### 22. Defina una función utilizando los comandos for, runif, mean, if, print cuya entrada sea un número natural ,n, y cuya salida sea print(c("el promedio dio mayor a cero ", salida, "veces de un total de ", n, "pruebas")), donde salida corresponde al total de veces que se cumplió la condición promedio mayor a cero. El programa tiene que tomar una muestra al azar de 10 variables aleatorias uniformes [-1,1] y determinar si el promedio de estas 10 variables es mayor a cero. Esto hay que repetirlo n veces, y luego dar el resultado de cua ́ntas veces el promedio dio mayor a cero en pantalla.
+
+#### a) Si n=10000, ¿qué valor espera obtener de salida?
+
+#### b) Cambie la función para determinar ahora la cantidad de veces que el promedio es mayor a 0,5. ¿Le sorprendió el resultados?
+
+#### c) Nuevamente cambie la función para determinar la cantidad de veces que el promedio es mayor a 0,5 cuando tomamos un promedio de 2 variables en vez de 10.0.
+
+```{r}
+funcion_22=function(n){
+w<-0
+  for (i in c(1:n)){
+    x<-runif(10,-1,1)
+    if (mean(x)>0){w=w+1}
+  }
+print(c("el promedio dio mayor a cero ", w, "veces de un total de ", n, "pruebas"))
+}
+funcion_22(10)
+
+```
+
+### 23. ¿Hay algo que le parece que se puede mejorar en código de abajo?
+
+```{r,eval = FALSE}
+tic()
+ for (i in 1:30){ muestra=rnorm(10,0,2) 
+   if (mean(muestra)>0) { 
+      print(c("en la muestra",i, "el promedio dio mayor a cero")) }
+   if (mean(muestra)<=(-0.5)) { 
+      print(c("en la muestra",i, "el promedio dio menor a cero"))}
+ }
+toc()
+```
+
+```{r}
+tic()
+matriz_23<-matrix(nrow=30, ncol=10)
+for (i in 1:30){
+matriz_23[i,]<-rnorm(10,0,2)
+}
+matriz_231<-apply(matriz_23,1,mean)
+matriz_231
+toc()
+```
+
+### 24. Investigue que hace el comando strsplit sobre una cadena de caracteres. ¿Cuántos argumentos necesitan obligatoriamente la función? Hint:str(strsplit) ¿Cómo devuelve el resultado? ¿en forma de un vector?
+```{r}
+char_24='abcdef'
+strsplit(char_24,split='')[[1]][[2]]
+
+```
+
+
+### 25. Construya una función que tenga como argumento un vector de palabras (ej: palabras=c(`casa'',`auto'', `subte'',`tren'')) y que devuelva lo siguiente:
+
+```{r,eval=FALSE}
+funcion_25=function(palabra){
+for (i in palabra){
+if (strsplit(i,split='')[[1]][[2]]=='u'){
+  if (nchar(i)==4) {print(c("La palabra ", i, " tiene 4 caracteres y la segunda letra es una u"))} else {
+  print(c("La palabra ", i, " tiene 5 caracteres o la segunda letra es una u"))}
+  } 
+if (nchar(i)==5){
+  print(c("La palabra ", i, " tiene 5 caracteres o la segunda letra es una u"))
+}
+}}
+  
+  
+funcion_25(c('casa','auto', 'subte','tren'))
+```
+
+### 26. ¿Hay alguna diferencia entre las dos condiciones de abajo?
+
+```{r,eval = FALSE}
+```
+
+### 27. Escriba un solo $if$ con la condición de que ocurra que $ncaracteres$ sea igual a 8 o que la segunda letra es una $u$, pero que no ocurran ambos eventos al mismo tiempo.
+
+```{r,eval=FALSE}
+x='autopist'
+if (nchar(x)==8 && strsplit(x,split='')[[1]][[2]]=='u'){ print('Prefiero la presencialidad') }
+```
+
+### 28. Investigue qué hace el comando ifelse(condicion, resultado1, resultado2). Realice un ejemplo.
+
+```{r}
+
+```
+
+### 29. Investigue qué hace el comando
+
+
+```{r,eval=FALSE}
+is.vector(x); is.matrix(x); is.array(x)
+x_29<-rbinom(1,1,0.5)
+
+x_29
+
+### 30.  Diálogo de la película Karate Kid (1984) minuto 122. 
+#Daniel San: ¿Sr. Miyagi me presta una moneda? 
+#Sr. Miyagi:  Aquí tienes Daniel San, $rbinom$(1,1,0.5).
+
+
+
+### 31. Comando $while$: una mezcla entre un $for$  y un $if$ con $stop$. Explique qué hace el siguiente algoritmo.
+z<-0
+while(z>= -10  && z<=10){ 
+  coin <- rbinom(1, 1, 0.5)
+  if(coin == 1) {  z<-z+1 }
+  if(coin == 0) {  z<-z-1 }
+}
+```
+
+
+### 32. ¿Qué representa el tau del algoritmo de abajo? ¿Le suena random walk?
+
+```{r}
+taus<-c()
+for (i in 1:100){
+z<-0
+tau<-0
+while(z>= -10  && z<=10){ 
+	tau<-tau+1
+	coin <- rbinom(1, 1, 0.5)
+    if(coin == 1) {  z<-z+1 }
+	  if(coin == 0) {  z<-z-1 }
+}
+taus[i]<-tau
+}
+hist(taus)
+```
+
+### 33. Estudie la distribución de tau del ejercicio anterior.
+
+```{r}
+```
